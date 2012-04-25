@@ -1,2 +1,11 @@
-h1= title
-p Welcome to #{title}
+section(id="artists")
+  div(class="page-header")
+    h1 Artists
+  div(class="row")
+    div(class="span8")
+      form(action="#")
+        label
+          h3 Search artist news 
+        input(type="text", class="span8", placeholder="Type artists names to search info…")
+        span(class="help-block") You should type 5 artists names separated by "," (comma)
+        button(type="submit", class="btn") Search
