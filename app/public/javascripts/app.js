@@ -21,7 +21,7 @@ Artwist.Message = Ember.View.create({
 Artwist.Artist = Ember.Object.extend({
   name: null,
   url: null,
-  news: [],
+  news: {},
   events: []
 });
 
@@ -56,8 +56,19 @@ Artwist.SearchArtistsView = Ember.TextField.extend({
         });
       if(values.length >= 5) {
         //fetch info from server
-        values.forEach(function(item){
-          Artwist.ArtistController.createArtist({name: item});
+        $.ajax({
+          url: '/artists',
+          type: 'POST',
+          data: { "artists": values },
+          success: function( data ) {
+            data.forEach(function(item){
+              Artwist.ArtistController.createArtist(item);
+            });
+          },
+          error: function(data) {
+            //handle error
+            console.log(data);
+          }
         });
       } else {
         Artwist.Message.alert("You have to provide at least 5 artist names!");
