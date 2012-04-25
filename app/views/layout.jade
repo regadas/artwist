@@ -30,6 +30,9 @@ html
               li
                 a(href="#contact") Contact
     div(class="container")!= body
-
-    script(src="/javascript/jquery.min.js")
-    script(src="/javascript/bootstrap.min.js")
+    script(src="/javascripts/jquery.min.js")
+    script(src="/javascripts/ember.min.js")
+    script(src="/javascripts/bootstrap.min.js")
+    script(src="/javascripts/app.js")
+    script(type="text/x-handlebars", data-template-name="message")
+      <div {{bindAttr class="level"}}>{{message}}</div>
