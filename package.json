@@ -1,9 +1,11 @@
 {
-    "name": "application-name"
-  , "version": "0.0.1"
-  , "private": true
-  , "dependencies": {
-      "express": "2.5.8"
-    , "jade": ">= 0.0.1"
+  "name": "artwist",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "~2.5.9",
+    "jade": "~0.25.0",
+    "request": "~2.9.202",
+    "echonest": "0.0.3"
   }
 }
