@@ -16,7 +16,7 @@ section(id="artists")
     |   <div class="span4">
     |     <h2>{{content.name}}</h2>
     |     <h4>
-    |       <a href="{{content.news.url}}">{{content.news.title}}</a>
+    |       <a {{bindAttr href="content.news.url" }}>{{content.news.title}}</a>
     |     </h4>
     |     <p>{{content.news.summary}}</o>
     |   </div>
