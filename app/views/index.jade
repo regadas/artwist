@@ -14,7 +14,7 @@ section(id="artists")
     | {{#collection contentBinding="Artwist.ArtistController" tagName="div" class="row"}}
     |   <div class="span4">
     |     <h2>{{content.name}}</h2>
-    |     {{#if content.news}}
+    |     {{#if content.id}}
     |       <h4>
     |         <a {{bindAttr href="content.news.url" }}>{{content.news.title}}</a>
     |       </h4>

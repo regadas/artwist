@@ -19,6 +19,7 @@ Artwist.Message = Ember.View.create({
 });
 
 Artwist.Artist = Ember.Object.extend({
+  id: null,
   name: null,
   news: null,
   events: []
@@ -43,7 +44,8 @@ Artwist.ArtistsView = Ember.View.extend({
 
 Artwist.SearchArtistsView = Ember.TextField.extend({
   insertNewline: function() {
-    var value = this.get('value');
+    var that = this
+      , value = that.get('value');
 
     if(value) {
       Artwist.Message.hide();
@@ -61,6 +63,8 @@ Artwist.SearchArtistsView = Ember.TextField.extend({
           data: { "artists": values },
           success: function( data ) {
             data.forEach(function(item){
+              that.set('value', '');
+              console.log(item);
               Artwist.ArtistController.createArtist(item);
             });
           },
