@@ -13,7 +13,6 @@ module.exports = function( app ) {
       , event = new Event();
 
     event.on('send', function() {
-      console.log(results);
       res.json(results);
     });
     var timer = setTimeout(function() {
