@@ -6,7 +6,7 @@ Artwist.Message = Ember.View.create({
   level: null,
   alert: function (message) {
     this.message = message;
-    this.level = "alert";
+    this.level = "alert alert-error";
     this.show();
   },
 
@@ -20,8 +20,7 @@ Artwist.Message = Ember.View.create({
 
 Artwist.Artist = Ember.Object.extend({
   name: null,
-  url: null,
-  news: {},
+  news: null,
   events: []
 });
 
