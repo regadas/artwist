@@ -1,4 +1,4 @@
-Artwist = Ember.Application.create();
+(function(){Artwist = Ember.Application.create();
 
 Artwist.Message = Ember.View.create({
   templateName: 'message',
@@ -77,3 +77,4 @@ Artwist.SearchArtistsView = Ember.TextField.extend({
     }
   }
 });
+})();

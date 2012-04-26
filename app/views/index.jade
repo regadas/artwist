@@ -4,12 +4,11 @@ section(id="artists")
   div(class="row")
     div(class="span8")
       div(id="message")
-      form(action="#")
-        label
-          h3 Search artist news 
-        script(type="text/x-handlebars")
-          {{view Artwist.SearchArtistsView id="search" class="span8" placeholder="Search artists info..."}}
-        span(class="help-block") You should type 5 artists names separated by "," (comma)
+      label
+        h3 Search artist news 
+      script(type="text/x-handlebars")
+        {{view Artwist.SearchArtistsView id="search" class="span8" placeholder="Search artists info..."}}
+      span(class="help-block") You should type 5 artists names separated by "," (comma)
 
   script(type="text/x-handlebars")
     | {{#collection contentBinding="Artwist.ArtistController" tagName="div" class="row"}}
