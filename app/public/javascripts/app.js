@@ -33,13 +33,42 @@ Artwist.ArtistController = Ember.ArrayProxy.create({
     this.pushObject(artist);
   },
 
-  clear: function() {
-    this.forEach(this.removeObject, this.content);
+  fetchNews: function(values, callback){
+    $.ajax({
+      url: '/artists',
+      type: 'POST',
+      data: { "artists": values },
+      success: function( data ) {
+        callback(data);
+      },
+      error: function(data) { console.log(data); }
+    });
+  },
+
+  fetchEvent: function(artist, callback) {
+    $.ajax({
+      url: '/artist/'+artist.id+'/events',
+      success: function( data ) {
+        artist.set('events', data.events);
+        callback(data);
+      },
+      error: function(data) { console.log(data); }
+    });
   }
 });
 
-Artwist.ArtistsView = Ember.View.extend({
-
+Artwist.EventsButton = Ember.Button.extend({
+  click: function(){
+    var that = this
+      , artist = that.get('artist');
+    Artwist.ArtistController.fetchEvent(artist, function(data){
+      if(data) {
+        that.remove();
+      } else {
+        //TODO: show no data message;
+      }
+    });
+  }
 });
 
 Artwist.SearchArtistsView = Ember.TextField.extend({
@@ -57,20 +86,12 @@ Artwist.SearchArtistsView = Ember.TextField.extend({
         });
       if(values.length >= 5) {
         //fetch info from server
-        $.ajax({
-          url: '/artists',
-          type: 'POST',
-          data: { "artists": values },
-          success: function( data ) {
+        Artwist.ArtistController.fetchNews(values, function(data){
+          if(data){
             data.forEach(function(item){
-              that.set('value', '');
-              console.log(item);
               Artwist.ArtistController.createArtist(item);
             });
-          },
-          error: function(data) {
-            //handle error
-            console.log(data);
+            that.set('value', '');
           }
         });
       } else {

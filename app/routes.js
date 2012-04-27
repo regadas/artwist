@@ -51,7 +51,13 @@ module.exports = function( app ) {
     } else { sendResult() }
   });
 
-  app.get('/artist/events', function(req, res){
+  app.get('/artist/:id/events', function(req, res){
+    res.json({
+      events: [{
+        uri: "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
+        name: "Wild Flag at The Fillmore (April 18, 2012)"
+      }]
+    });
   });
 
 
