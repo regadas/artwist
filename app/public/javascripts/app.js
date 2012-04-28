@@ -20,8 +20,9 @@ Artwist.Message = Ember.View.create({
 
 Artwist.Artist = Ember.Object.extend({
   id: null,
+  songkick: null,
   name: null,
-  news: null,
+  news: [],
   events: []
 });
 
@@ -47,7 +48,7 @@ Artwist.ArtistController = Ember.ArrayProxy.create({
 
   fetchEvent: function(artist, callback) {
     $.ajax({
-      url: '/artist/'+artist.id+'/events',
+      url: '/artist/'+artist.songkick+'/events',
       success: function( data ) {
         artist.set('events', data.events);
         callback(data);
