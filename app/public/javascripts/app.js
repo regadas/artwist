@@ -4,7 +4,6 @@ Artwist.GeneralMessage = Ember.View.extend({
   templateName: 'message',
   message: null,
   level: null,
-
   show: function () {
     this.appendTo('#message');
   },

@@ -10,8 +10,8 @@ module.exports = function(app) {
     app.use(express.logger());
     app.use(express.bodyParser());
     app.use(express.methodOverride());
-    app.use(app.router);
     app.use(express.static(__dirname + '/public'));
+    app.use(app.router);
     app.set('echonest', new echonest.Echonest({
       api_key: process.env.ECHONEST_KEY
     }));
@@ -24,9 +24,7 @@ module.exports = function(app) {
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
   });
 
-  app.configure('production', function(){
-    app.use(express.errorHandler());
-  });
+  app.configure('production', function(){});
 
   return app;
 }

@@ -8,17 +8,21 @@ module.exports = function(app){
 
   NotFound.prototype.__proto__ = Error.prototype;
 
+  app.all('*', function(req, res, next) {
+     throw new NotFound;
+  });
+
   app.error(function(err, req, res, next){
-      if (err instanceof NotFound) {
-          res.render('404');
-      } else {
-          next(err);
-      }
+    if (err instanceof NotFound) {
+      res.render('404.jade');
+    } else {
+      next(err);
+    }
   });
 
   app.error(function(err, req, res){
     console.log(err);
-    res.render('500', {
+    res.render('500.jade', {
       error: err
     });
   });

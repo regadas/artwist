@@ -42,7 +42,7 @@ module.exports = function( app ) {
             });
 
           } else {
-            //append error to the element
+            //append error to the element since this is a bulk fetch
             var result = {
               name: name,
               error: error
