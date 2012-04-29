@@ -32,17 +32,18 @@ Artist.find = function(name, callback) {
     }
     var meta = response.artists[0]
       , sk = function(){
-        if(meta.foreign_ids[0]) {
+        if(meta.foreign_ids && meta.foreign_ids[0]) {
           return meta.foreign_ids[0].foreign_id.split(':')[2];
         }
       };
     if(!meta) {
       return callback(errors.NotFound("Oh Noes! we didn't find a artist"), undefined)
     }
-    callback(undefined, new Artist(meta.id, meta.name, sk));
+    callback(undefined, new Artist(meta.id, meta.name, sk()));
   });
 }
 
+//we could provide an options argument here to pass options to the request
 Artist.news = function(id, callback) {
   echonest.artist.news({ id: id, results: 1 }, function(error, response) {
     if(error || (response && response.status.code)){
@@ -50,8 +51,7 @@ Artist.news = function(id, callback) {
       console.log(error, response);
       return callback(errors.System(), undefined);
     }
-    var news = response.news[0]
-    callback(undefined, news);
+    callback(undefined, response.news || []);
   });
 
 }
@@ -74,7 +74,7 @@ Artist.events = function(id, options, callback) {
       if(!error && response.statusCode == 200) {
         var results = body.resultsPage.results
           , events = [];
-        if(results){
+        if(results && results.event){
           events = results.event;
         }
         callback(undefined, events);

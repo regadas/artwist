@@ -11,14 +11,14 @@ module.exports = function( app ) {
 
   app.post('/artists', function(req, res){
     var data = req.body
-      , results = {
+      , response = {
         error: null,
         results: []
       }
       , event = new Event();
 
     event.on('send', function() {
-      res.json(results);
+      res.json(response);
     });
     var timer = setTimeout(function() {
       event.emit('send', 2000);
@@ -34,40 +34,33 @@ module.exports = function( app ) {
       data.artists.forEach(function(name){
         Artist.find(name, function(error, artist){
           if(!error){
+
             Artist.news(artist.id, function(error, news){
-              var result = artist;
-              if(!error){
-                artist['news'] = {
-                  title: news.name,
-                  url: news.url,
-                  summary: news.summary,
-                };
-              } else {
-                results.error = error;
-              }
-              results.push(result);
-              if(results.length == length) sendResult();
+              artist['news'] = news;
+              response.results.push(artist);
+              if(response.results.length == length) sendResult();
             });
+
           } else {
-            results.error = error;
-            results.push({ name: name });
-            if(results.length == length) sendResult();
+            //append error to the element
+            var result = {
+              name: name,
+              error: error
+            };
+            response.results.push({ name: name });
+            if(response.results.length == length) sendResult();
           }
         });
       });
     } else { 
-      results.error = errors.System("Oh Noes! no data provided");
+      response.error = errors.System("Oh Noes! no data provided");
       sendResult();
     }
   });
 
   app.get('/artist/:id/events', function(req, res){
     Artist.events(req.params.id, { per_page: 5 }, function(error, data){
-      if(error){
-        res.json({ error: error });
-      } else {
-        res.json({ events: data });
-      }
+      res.json({ events: data , error: error });
     });
   });
 

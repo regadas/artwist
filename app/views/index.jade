@@ -15,23 +15,32 @@ section(id="artists")
     |   <div class="span8">
     |     <h2>{{content.name}}</h2>
     |     {{#if content.id}}
-    |       <h4>
-    |         <a {{bindAttr href="content.news.url" }}>{{content.news.title}}</a>
-    |       </h4>
-    |       <p>{{{content.news.summary}}}</p>
-    |       {{#if content.events }}
-    |       <div class="span8">
-    |         <h4>Events</h4>
-    |         <ul>
-    |         {{#each content.events }}
-    |           <li><a {{bindAttr href="uri"}}>{{ displayName }}</a></li>
+    |       {{#if content.news.length }}
+    |         {{#each content.news }}
+    |           <h4>
+    |             <a {{bindAttr href="url" }}>{{name}}</a>
+    |           </h4>
+    |           <p>{{{summary}}}</p>
     |         {{/each}}
-    |         </ul>
-    |       </div>
+    |       {{else}}
+    |         <div class="alert">No latest news for this artist!</div>
+    |       {{/if}}
+    |       {{#if content.hasNoEvents }}
+    |         <div class="alert">No events for this artist!</div>
+    |       {{/if}}
+    |       {{#if content.events }}
+    |         <div class="span8">
+    |           <h4>Events</h4>
+    |           <ul>
+    |           {{#each content.events }}
+    |             <li><a {{bindAttr href="uri"}}>{{ displayName }}</a></li>
+    |           {{/each}}
+    |           </ul>
+    |         </div>
     |       {{/if}}
     |       {{#view Artwist.EventsButton artistBinding="content" class="btn"}}Events{{/view}}
     |     {{else}}
-    |       <div class="alert">No news for this artist. The name you search for might be wrong!</div>
+    |       <div class="alert">The name you search for might be wrong!</div>
     |     {{/if}}
     |   </div>
     | {{/collection}}

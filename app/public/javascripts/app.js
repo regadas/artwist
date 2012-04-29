@@ -1,14 +1,9 @@
 Artwist = Ember.Application.create();
 
-Artwist.Message = Ember.View.create({
+Artwist.GeneralMessage = Ember.View.extend({
   templateName: 'message',
   message: null,
   level: null,
-  alert: function (message) {
-    this.message = message;
-    this.level = "alert alert-error";
-    this.show();
-  },
 
   show: function () {
     this.appendTo('#message');
@@ -18,12 +13,28 @@ Artwist.Message = Ember.View.create({
   }
 });
 
+Artwist.Message = Artwist.GeneralMessage.create({
+  level: "alert alert-error",
+  alert: function (message) {
+    this.message = message;
+    this.show();
+  }
+});
+
 Artwist.Artist = Ember.Object.extend({
   id: null,
   songkick: null,
   name: null,
-  news: [],
-  events: []
+  news: null,
+  events: null,
+  //hack ... temporary till i see how ember 
+  //can append a view to sepecifc elem on collection
+  hasNoEvents: function() {
+    if(this.get('events') instanceof Array && !this.get('events').length) {
+      return true;
+    }
+    return false;
+  }.property('events')
 });
 
 Artwist.ArtistController = Ember.ArrayProxy.create({
@@ -39,35 +50,33 @@ Artwist.ArtistController = Ember.ArrayProxy.create({
       url: '/artists',
       type: 'POST',
       data: { "artists": values },
-      success: function( data ) {
-        callback(data);
-      },
+      success: function( data ) { callback(data); },
       error: function(data) { console.log(data); }
     });
   },
 
   fetchEvent: function(artist, callback) {
-    $.ajax({
-      url: '/artist/'+artist.songkick+'/events',
-      success: function( data ) {
-        artist.set('events', data.events);
-        callback(data);
-      },
-      error: function(data) { console.log(data); }
-    });
+    if(artist.songkick){
+      $.ajax({
+        url: '/artist/'+artist.songkick+'/events',
+        success: function( data ) { callback(data); },
+        error: function(data) { console.log(data); }
+      });
+    } else {
+      //TODO: not possible to fetch events since there isn't a map between echo & sk
+    }
   }
 });
+
 
 Artwist.EventsButton = Ember.Button.extend({
   click: function(){
     var that = this
       , artist = that.get('artist');
     Artwist.ArtistController.fetchEvent(artist, function(data){
-      if(data) {
-        that.remove();
-      } else {
-        //TODO: show no data message;
-      }
+      //TODO: we should check for error to see if the mepty events are really empty
+      artist.set('events', data.events);
+      that.remove();
     });
   }
 });
@@ -88,12 +97,12 @@ Artwist.SearchArtistsView = Ember.TextField.extend({
       if(values.length >= 5) {
         //fetch info from server
         Artwist.ArtistController.fetchNews(values, function(data){
-          if(data){
-            data.forEach(function(item){
+          if(!data.error){
+            data.results.forEach(function(item){
               Artwist.ArtistController.createArtist(item);
             });
             that.set('value', '');
-          }
+          } 
         });
       } else {
         Artwist.Message.alert("You have to provide at least 5 artist names!");
