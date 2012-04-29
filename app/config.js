@@ -1,5 +1,6 @@
 const express = require('express')
-    , echonest = require('echonest');
+    , echonest = require('echonest')
+    , songkick = require('../lib/songkick');
 
 module.exports = function(app) {
 
@@ -14,10 +15,9 @@ module.exports = function(app) {
     app.set('echonest', new echonest.Echonest({
       api_key: process.env.ECHONEST_KEY
     }));
-    app.set('songkick', { 
-      api_key: process.env.SONGKICK_KEY,
-      url: 'http://api.songkick.com/api/3.0'
-    });
+    app.set('songkick', new songkick({
+      api_key: process.env.SONGKICK_KEY
+    }));
   });
 
   app.configure('development', function(){

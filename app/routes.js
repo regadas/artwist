@@ -28,11 +28,11 @@ module.exports = function( app ) {
       var length = data.artists.length;
 
       data.artists.forEach(function(name){
-        Artist.find(name, function(artist){
+        Artist.find(name, function(error, artist){
           if(artist){
-            Artist.news(artist.id, function(status, news){
+            Artist.news(artist.id, function(error, news){
               var result = artist;
-              if(!status){
+              if(!error){
                 artist['news'] = {
                   title: news.name,
                   url: news.url,
@@ -52,7 +52,7 @@ module.exports = function( app ) {
   });
 
   app.get('/artist/:id/events', function(req, res){
-    Artist.events(req.params.id, function(data){
+    Artist.events(req.params.id, { per_page: 5 }, function(error, data){
       res.json({ events: data });
     });
   });

@@ -1,6 +1,7 @@
 
-var request = require('request')
-  , Artist = {}
+const request = require('request');
+
+var Artist = {}
   , app
   , echonest
   , songkick;
@@ -19,44 +20,55 @@ Artist = function(id, name, songkick) {
 };
 
 Artist.find = function(name, callback) {
-  echonest.artist.search({ name: name, results: 1 , bucket: 'id:songkick'}, function(error, response) {
-    if (error) { //fetch || connection error
+  echonest.artist.search({ 
+    name: name, 
+    results: 1 , 
+    bucket: 'id:songkick'
+  }, function(error, response) {
+    var status = response.status.code;
+    if(error || status){
+      //something wrong during request
       console.log(error, response);
-    } else {
-      var meta = response.artists[0]
-        , sk = (function(){
-          if(meta.foreign_ids[0]) {
-            return meta.foreign_ids[0].foreign_id.split(':')[2];
-          }
-        })();
-      callback(new Artist(meta.id, meta.name, sk));
+      return callback(status, undefined);
     }
+    var meta = response.artists[0]
+      , sk = (function(){
+        if(meta.foreign_ids[0]) {
+          return meta.foreign_ids[0].foreign_id.split(':')[2];
+        }
+      })();
+    callback(undefined, new Artist(meta.id, meta.name, sk));
   });
 }
 
 Artist.news = function(id, callback) {
   echonest.artist.news({ id: id, results: 1 }, function(error, response) {
-    if(error){
+    var status = response.status.code;
+    //well diferent status could be retrieved from echonest
+    // we will consider all of them besides 0 as errors
+    if(error || status){
+      //something wrong during request
       console.log(error, response);
-    } else {
-      var status = response.status.code;
-      switch(status) {
-        case 0:
-          var news = response.news[0]
-          callback(status, news);
-          break;
-        default:
-          callback(status, undefined);
-      }
+      return callback(status, undefined);
     }
+    var news = response.news[0]
+    callback(undefined, news);
   });
 
 }
 
-Artist.events = function(id, callback) {
+//finds an artist for a given songkick id
+//callback(error, data)
+Artist.events = function(id, options, callback) {
+  //the id required is a songkick id which is a 'number'
+  if(isNaN(id)) {
+    return callback({error: 'the id supplied is not a valid id'}, undefined);
+  }
+
+  //still ugly !! I should improve the lib for songkick.
+  var pathname = 'artists/'+id+'/calendar.json';
   request({
-    //ugly as hell!! we should make a lib for songkick.
-    url: songkick.url+'/artists/'+id+'/calendar.json?apikey='+songkick.api_key+'&per_page=10',
+    url: songkick.url(pathname, options),
     json:true
     }, function(error, response, body){
       if(!error && response.statusCode == 200) {
@@ -65,9 +77,12 @@ Artist.events = function(id, callback) {
         if(results){
           events = results.event;
         }
-        callback(events);
+        callback(undefined, events);
       } else {
-        console.log(response);
+        callback({
+          error: error,
+          response: response
+        }, undefined);
       }
   });
 }
