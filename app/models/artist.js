@@ -1,5 +1,6 @@
 
-const request = require('request');
+const request = require('request')
+    , errors = require('../inner_errors');
 
 var Artist = {}
   , app
@@ -25,31 +26,29 @@ Artist.find = function(name, callback) {
     results: 1 , 
     bucket: 'id:songkick'
   }, function(error, response) {
-    var status = response.status.code;
-    if(error || status){
+    if(error || (response && response.status.code)){
       //something wrong during request
-      console.log(error, response);
-      return callback(status, undefined);
+      return callback(errors.System(), undefined);
     }
     var meta = response.artists[0]
-      , sk = (function(){
+      , sk = function(){
         if(meta.foreign_ids[0]) {
           return meta.foreign_ids[0].foreign_id.split(':')[2];
         }
-      })();
+      };
+    if(!meta) {
+      return callback(errors.NotFound("Oh Noes! we didn't find a artist"), undefined)
+    }
     callback(undefined, new Artist(meta.id, meta.name, sk));
   });
 }
 
 Artist.news = function(id, callback) {
   echonest.artist.news({ id: id, results: 1 }, function(error, response) {
-    var status = response.status.code;
-    //well diferent status could be retrieved from echonest
-    // we will consider all of them besides 0 as errors
-    if(error || status){
+    if(error || (response && response.status.code)){
       //something wrong during request
       console.log(error, response);
-      return callback(status, undefined);
+      return callback(errors.System(), undefined);
     }
     var news = response.news[0]
     callback(undefined, news);
@@ -62,7 +61,8 @@ Artist.news = function(id, callback) {
 Artist.events = function(id, options, callback) {
   //the id required is a songkick id which is a 'number'
   if(isNaN(id)) {
-    return callback({error: 'the id supplied is not a valid id'}, undefined);
+    //return a regular not found
+    return callback(errors.NotFound("Wrong if format"), undefined);
   }
 
   //still ugly !! I should improve the lib for songkick.
@@ -79,10 +79,7 @@ Artist.events = function(id, options, callback) {
         }
         callback(undefined, events);
       } else {
-        callback({
-          error: error,
-          response: response
-        }, undefined);
+        callback(errors.System(), undefined);
       }
   });
 }

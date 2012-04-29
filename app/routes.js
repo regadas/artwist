@@ -1,5 +1,6 @@
 var Event = require('events').EventEmitter
-  , ArtistModel = require('./models/artist');
+  , ArtistModel = require('./models/artist')
+  , errors = require('./inner_errors.js');
 
 module.exports = function( app ) {
   var Artist = ArtistModel( app );
@@ -10,7 +11,10 @@ module.exports = function( app ) {
 
   app.post('/artists', function(req, res){
     var data = req.body
-      , results = []
+      , results = {
+        error: null,
+        results: []
+      }
       , event = new Event();
 
     event.on('send', function() {
@@ -29,7 +33,7 @@ module.exports = function( app ) {
 
       data.artists.forEach(function(name){
         Artist.find(name, function(error, artist){
-          if(artist){
+          if(!error){
             Artist.news(artist.id, function(error, news){
               var result = artist;
               if(!error){
@@ -38,22 +42,32 @@ module.exports = function( app ) {
                   url: news.url,
                   summary: news.summary,
                 };
+              } else {
+                results.error = error;
               }
               results.push(result);
               if(results.length == length) sendResult();
             });
-          } else { 
+          } else {
+            results.error = error;
             results.push({ name: name });
             if(results.length == length) sendResult();
           }
         });
       });
-    } else { sendResult() }
+    } else { 
+      results.error = errors.System("Oh Noes! no data provided");
+      sendResult();
+    }
   });
 
   app.get('/artist/:id/events', function(req, res){
     Artist.events(req.params.id, { per_page: 5 }, function(error, data){
-      res.json({ events: data });
+      if(error){
+        res.json({ error: error });
+      } else {
+        res.json({ events: data });
+      }
     });
   });
 
